@@ -3,24 +3,35 @@
 #include <sys/types.h> //mode_t
 #include <sys/stat.h>  //mode_t mkfifo
 #include <iomanip>     //std::localtime
+#include <fcntl.h>     //O_WRONLY O_RDONLY
+#include <fstream>     //fstream
 
 int main(int argc, char *argv[]) {
-	std::time_t time = std::time(nullptr);
-	std::cout << "Client: PID " << getpid() <<  " - "
-					<< std::put_time(std::localtime(&time),"%F_%T") << '\n';
+	//std::cout << "Client: PID " << getpid();
 	
-	if(mkfifo("ctos", S_IRUSR | S_IWUSR) < 0) {
-		std::cout << "Failed\n";	
-	}
+	mkfifo("ctos", S_IRUSR | S_IWUSR);
+	mkfifo("stoc", S_IRUSR | S_IWUSR);
 	
 	pid_t pid = fork();
+	
 	if(pid == 0){
-		std::cout << pid << " Child Process " << getpid() << '\n';
 		execl("Server",NULL);
-		std::cout << "After Exec\n";
 	}
 	
+	std::fstream ctos;
+	//ctos.open("ctos");
 	
+	//ctos.close();
 	
-	std::cout << pid << " Goodbye Client " << getpid() << '\n';
+	std::fstream stoc;
+	stoc.open("stoc");
+	
+	char * buffer = new char [1024];
+	stoc.read(buffer,1024);
+	std::cout << buffer;
+	delete[] buffer;
+	
+	stoc.close();
+	
+	return 0;
 }

@@ -1,21 +1,23 @@
 #include <iostream>
-#define fifo "/home/justijk/ctos"
+#include <fcntl.h>
+#include <fstream>
+
 int main() {
-	open(fifo, O_RDONLY);
+	std::fstream ctos;
+	std::fstream stoc;
 	
-	/*if(mkfifo(fifo, 0666) < 0) {
-		return 1;
-	}
+	//Read from Client
+	//ctos.open("ctos");
 	
-	int fifo_int = open(fifo, O_RDONLY);
-	if(fifo_int < 0) {
-		return 2;
-	}
 	
-	char temp[32];
-	if(read(fifo_int, temp, sizeof(temp)) < 0) {
-		return 3;
-	}
-	*/
 	
+	//ctos.close();
+	
+	//Write to Client
+	stoc.open("stoc");
+	
+	stoc.write("Hah\n", 1024);
+	
+	stoc.close();
+	return 0;
 }
