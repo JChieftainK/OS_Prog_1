@@ -1,23 +1,19 @@
-#include <iostream>
 #include <fcntl.h>
 #include <fstream>
 
 int main() {
-	std::fstream ctos;
-	std::fstream stoc;
-	
-	//Read from Client
-	//ctos.open("ctos");
+	std::ofstream stoc ("stoc", std::ofstream::out);
+	std::ifstream ctos ("ctos", std::ifstream::in);
 	
 	
+	char * buffer = new char [1024];
+	ctos.getline(buffer, 1024);
+	std::string something = "SWrite";
+	stoc.write(something.c_str(), 1024);
+	delete[] buffer;
 	
-	//ctos.close();
-	
-	//Write to Client
-	stoc.open("stoc");
-	
-	stoc.write("Hah\n", 1024);
-	
+	ctos.close();
 	stoc.close();
+	
 	return 0;
 }

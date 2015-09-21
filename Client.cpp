@@ -1,9 +1,6 @@
 #include <iostream>
 #include <unistd.h>    //execl
-#include <sys/types.h> //mode_t
-#include <sys/stat.h>  //mode_t mkfifo
-#include <iomanip>     //std::localtime
-#include <fcntl.h>     //O_WRONLY O_RDONLY
+#include <sys/stat.h>  //S_IRUSR S_IWUSR mkfifo
 #include <fstream>     //fstream
 
 int main(int argc, char *argv[]) {
@@ -13,25 +10,21 @@ int main(int argc, char *argv[]) {
 	mkfifo("stoc", S_IRUSR | S_IWUSR);
 	
 	pid_t pid = fork();
-	
 	if(pid == 0){
-		execl("Server",NULL);
+		execl("Server", NULL);
 	}
 	
-	std::fstream ctos;
-	//ctos.open("ctos");
+	std::ifstream stoc ("stoc", std::ifstream::in);
+	std::ofstream ctos ("ctos", std::ifstream::out);
 	
-	//ctos.close();
-	
-	std::fstream stoc;
-	stoc.open("stoc");
-	
+	ctos.write("CWrite", 1024);
 	char * buffer = new char [1024];
 	stoc.read(buffer,1024);
-	std::cout << buffer;
+	std::cout << "'" << buffer << "'\n";
 	delete[] buffer;
 	
 	stoc.close();
+	ctos.close();
 	
 	return 0;
 }
