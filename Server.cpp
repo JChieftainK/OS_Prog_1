@@ -5,19 +5,34 @@
 #include <fstream>
 
 int main() {
-	std::ofstream stoc ("stoc", std::ofstream::out);
+	time_t rawtime;
+	int c_pid = getpid();
+	time (&rawtime);
+	std::cout << "Server: PID " << c_pid 
+						<< " - Running on "<< ctime(&rawtime);
+	
+	//Receiving handshake from client
 	std::ifstream ctos ("ctos", std::ifstream::in);
-	
-	
-	char * buffer = new char [1024];
-	std::cout << "trying to read\n";
-	ctos.getline(buffer, 1024);
-	std::cout << "REad\n";
-	std::string something = "SWrite";
-	stoc.write(something.c_str(), 1024);
-	delete[] buffer;
-	
+	if(ctos.is_open()) {
+		char * buffer = new char [1024];
+		ctos.getline(buffer, 1024);
+		if(strcmp(buffer,"We good?") == 0) {
+			std::cout << "Server: PID " << c_pid
+								<< " - Synchronized to Client.\n";
+		}else {
+			std::cout << "Server: Failure to Synchronize\n";
+			ctos.close();
+			exit(1);
+		}
+		delete[] buffer;
+	}
 	ctos.close();
+	
+	//Sending handshake to client
+	std::ofstream stoc ("stoc", std::ofstream::out);
+	if(stoc.is_open()) {
+		stoc.write("Yeah we good", 1024);
+	}
 	stoc.close();
 	
 	return 0;
