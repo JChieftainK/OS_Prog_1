@@ -1,7 +1,13 @@
 #include <iostream>
-#include <unistd.h>    //execl
 #include <sys/stat.h>  //S_IRUSR S_IWUSR mkfifo
-#include <fstream>     //fstream
+#include <stdio.h>     //remove
+#include <fcntl.h>     //O_WRONLY O_RDONLY
+#include <unistd.h>    //execl fork read write
+#include <cstring>     //strcmp
+
+int read_handshake(int);
+void read_server(int);
+int write_server(int, const char*);
 
 int main(int argc, char *argv[]) {
 	time_t rawtime;
@@ -17,17 +23,17 @@ int main(int argc, char *argv[]) {
 	getline(std::cin,file_string);
 	
 	//Enter target
-	std::cout << "\nClient: PID " << c_pid
+	std::cout << "Client: PID " << c_pid
 						<< " - Enter Target:\n";
 	std::string target_string;
 	getline(std::cin, target_string);
 					
 	//Display file name and target
-	std::cout << "\nClient: PID " << c_pid << " - Input File >>>" 
+	std::cout << "Client: PID " << c_pid << " - Input File >>>" 
 						<< file_string << "<<<\n";
 	std::cout << "Client: PID " << c_pid << " - Target >>>"
 						<< target_string << "<<<\n";
-					
+	
 	//Make the Named Pipes
 	//ctos = client to server
 	//stoc = server to client
@@ -41,35 +47,62 @@ int main(int argc, char *argv[]) {
 		execl("Server", NULL);
 	}
 	
-	//Sending handshake to server
-	std::ofstream ctos ("ctos", std::ifstream::out);
-	if(ctos.is_open()) {
-		ctos.write("We good?", 1024);
-	}
-	ctos.close();
+	//Open pipe to write to
+	int wr = open("ctos", O_WRONLY);
 	
-	//Receiving handshake from server
-	std::ifstream stoc ("stoc", std::ifstream::in);
-	if(stoc.is_open()) {
-		char * buffer = new char [1024];
-		stoc.getline(buffer, 1024);
-		if(strcmp(buffer,"Yeah we good") == 0) {
-			std::cout << "Client: PID " << c_pid
-							<< " - Synchronized to Client.\n";
+	//Write handshake to server 
+	std::string handshake = "Head nod and handshake";
+	write_server(wr, handshake.c_str());
+	
+	//Open pipe to read from server
+	int rd = open("stoc", O_RDONLY);
+	
+	//Read handshake from server
+	read_handshake(rd);
+	
+	//Write file target to server
+	write_server(wr, file_string.c_str());
+	
+	//Close pipes
+	close(wr);
+	close(rd);
+	
+	//Remove pipes
+	remove("ctos");
+	remove("stoc");
+	return 0;
+}
+
+//Read from server and display to screen
+void read_server(int read_from) {
+	char * buffer = new char[1024];
+	int rd_status = read(read_from, buffer, 1024);
+	std::cout << "Client: '" << buffer << "'\n";
+	delete[] buffer;
+}
+
+//Read handshake from server and confirm
+int read_handshake(int read_from) {
+	char * buffer = new char[1024];
+	int rd_status = read(read_from, buffer, 1024);
+	if(rd_status < 0) { 
+		//STILL NEED TO DO
+	}else {
+		if(strcmp(buffer, "Handshake and nod head") == 0) {
+			std::cout << "Client: PID " << getpid()
+								<< " - Synchronized to Server.\n";
 		}else {
-			std::cout << "Client: Failure to Synchronize\n";
-			ctos.close();
-			exit(1);
+			std::cout << "Client: PID " << getpid()
+								<< " - FAILURE TO SYNCHRONIZE\n";
 		}
-		delete[] buffer;
 	}
-	stoc.close();
+	delete[] buffer;
 	
-	//Tell server file to read
-	//Tell server phrase to search for
-	//Read in server
-	//Display results from server
-	//Terminate Client and Server
-	
+	return 0;
+}
+
+//Write to server given char array
+int write_server(int write_to, const char* buffer) {
+	int wr_status = write(write_to, buffer, sizeof(buffer) * 8);
 	return 0;
 }

@@ -1,39 +1,72 @@
 #include <iostream>
-#include <time.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <fstream>
+#include <unistd.h>    //execl fork read write
+#include <cstring>     //strcmp
 
-int main() {
+int read_handshake(int);
+void read_client(int);
+int write_client(int, const char*);
+
+int main(int argc, char *argv[]) {
 	time_t rawtime;
-	int c_pid = getpid();
+	int s_pid = getpid();
 	time (&rawtime);
-	std::cout << "Server: PID " << c_pid 
+	std::cout << "Server: PID " << s_pid 
 						<< " - Running on "<< ctime(&rawtime);
 	
-	//Receiving handshake from client
-	std::ifstream ctos ("ctos", std::ifstream::in);
-	if(ctos.is_open()) {
-		char * buffer = new char [1024];
-		ctos.getline(buffer, 1024);
-		if(strcmp(buffer,"We good?") == 0) {
-			std::cout << "Server: PID " << c_pid
+	//Open pipe to read from
+	int rd = open("ctos", O_RDONLY);
+	
+	//Read from client
+	read_handshake(rd);
+	
+	//Open pipe to write to
+	int wr = open("stoc", O_WRONLY);
+	
+	//Write handshake to client
+	std::string handshake = "Handshake and nod head";
+	write_client(wr,handshake.c_str());
+	
+	//Read from
+	read_client(rd);
+	
+	//Close pipes
+	close(rd);
+	close(wr);
+	
+	return 0;
+}
+
+//Read from client
+void read_client(int read_from) {
+	char * buffer = new char[1024];
+	int rd_status = read(read_from, buffer, 1024);
+	std::cout << "Server: '" << buffer << "'\n";
+	delete[] buffer;
+}
+
+//Read handshake from client and confirm
+int read_handshake(int read_from) {
+	char * buffer = new char[1024];
+	int rd_status = read(read_from, buffer, 1024);
+	if(rd_status < 0) { 
+		//STILL NEED TO DO
+	}else {
+		if(strcmp(buffer, "Head nod and handshake") == 0) {
+			std::cout << "Server: PID " << getpid()
 								<< " - Synchronized to Client.\n";
 		}else {
-			std::cout << "Server: Failure to Synchronize\n";
-			ctos.close();
-			exit(1);
+			std::cout << "Server: PID " << getpid()
+								<< " - FAILURE TO SYNCHRONIZE\n";
 		}
-		delete[] buffer;
 	}
-	ctos.close();
+	delete[] buffer;
 	
-	//Sending handshake to client
-	std::ofstream stoc ("stoc", std::ofstream::out);
-	if(stoc.is_open()) {
-		stoc.write("Yeah we good", 1024);
-	}
-	stoc.close();
-	
+	return 0;
+}
+
+//Write to client given char array
+int write_client(int write_to, const char* buffer) {
+	int wr_status = write(write_to, buffer, sizeof(buffer) * 8);
 	return 0;
 }
