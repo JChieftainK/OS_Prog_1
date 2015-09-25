@@ -5,13 +5,16 @@
 #include <unistd.h>    //execl fork read write
 #include <cstring>     //strcmp
 
+const std::string CONFIRMATION = "Confirmed";
+
+void read_confirmation(int);
 int read_handshake(int);
 void read_server(int);
 int write_server(int, const char*);
 
 int main(int argc, char *argv[]) {
-	time_t rawtime;
 	int c_pid = getpid();
+	time_t rawtime;
 	time (&rawtime);
 	std::cout << "Client: PID " << c_pid 
 						<< " - Running on "<< ctime(&rawtime);
@@ -49,28 +52,52 @@ int main(int argc, char *argv[]) {
 	
 	//Open pipe to write to
 	int wr = open("ctos", O_WRONLY);
-	
 	//Write handshake to server 
 	std::string handshake = "Head nod and handshake";
 	write_server(wr, handshake.c_str());
 	
 	//Open pipe to read from server
 	int rd = open("stoc", O_RDONLY);
-	
 	//Read handshake from server
 	read_handshake(rd);
 	
 	//Write file target to server
 	write_server(wr, file_string.c_str());
 	
+	//Read confirmation
+	read_confirmation(rd);
+	
+	//Write target to server
+	write_server(wr, target_string.c_str());
+	
+	//Read confirmation
+	read_confirmation(rd);
+	
 	//Close pipes
 	close(wr);
 	close(rd);
-	
 	//Remove pipes
 	remove("ctos");
 	remove("stoc");
+	sleep(1);
+	time (&rawtime);
+	std::cout << "Client: PID " << c_pid 
+					<< " - Terminated on "<< ctime(&rawtime);
 	return 0;
+}
+
+//Read confirmation from server
+void read_confirmation(int read_from) {
+	char * buffer = new char[1024];
+	int rd_status = read(read_from, buffer, 1024);
+	if(rd_status < 0) {
+		std::cout << "Client: FAILURE TO READ CONFIRMATION\n";
+	}else {
+		if(strcmp(buffer, "Confirmed") != 0) {
+			std::cout << "Client: CONFIRMATION FAILED\n";
+		}
+	}
+	delete[] buffer;	
 }
 
 //Read from server and display to screen
@@ -87,6 +114,7 @@ int read_handshake(int read_from) {
 	int rd_status = read(read_from, buffer, 1024);
 	if(rd_status < 0) { 
 		//STILL NEED TO DO
+		std::cout << "Client: FAILURE TO READ HANDSHAKE\n";
 	}else {
 		if(strcmp(buffer, "Handshake and nod head") == 0) {
 			std::cout << "Client: PID " << getpid()
