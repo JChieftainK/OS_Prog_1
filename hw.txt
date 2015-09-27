@@ -46,4 +46,4 @@ Be sure to adhere to the following guidelines:
 5. Recall, documents (per syllabus & lecture) you must create & submit. Your writeup should include your program operations, difficulties, successes, etc.
 6. You may utilize the languages C, C++, C# or Java. Your solution MUST compile on the Computer Science server.
 
-You should perform the following steps to successfully complete this assignment: Create and compile two separate files, one the client program and the other the server program. Your client must start the execution of your server. O only the client should display the results of the server process. You should turn in files as specified in the Syllabus. Produce & submit a discussion of your work. 
+You should perform the following steps to successfully complete this assignment: Create and compile two separate files, one the client program and the other the server program. Your client must start the execution of your server. Only the client should display the results of the server process. You should turn in files as specified in the Syllabus. Produce & submit a discussion of your work. 

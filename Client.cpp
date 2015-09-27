@@ -9,7 +9,7 @@ const std::string CONFIRMATION = "Confirmed";
 
 void read_confirmation(int);
 int read_handshake(int);
-void read_server(int);
+int read_server(int);
 int write_server(int, const char*);
 
 int main(int argc, char *argv[]) {
@@ -73,13 +73,18 @@ int main(int argc, char *argv[]) {
 	//Read confirmation
 	read_confirmation(rd);
 	
+	while(read_server(rd) != 1) {
+		//Send confirmation
+		write_server(wr, CONFIRMATION.c_str());
+	}
+	
 	//Close pipes
 	close(wr);
 	close(rd);
 	//Remove pipes
 	remove("ctos");
 	remove("stoc");
-	sleep(1);
+	
 	time (&rawtime);
 	std::cout << "Client: PID " << c_pid 
 					<< " - Terminated on "<< ctime(&rawtime);
@@ -101,11 +106,17 @@ void read_confirmation(int read_from) {
 }
 
 //Read from server and display to screen
-void read_server(int read_from) {
+int read_server(int read_from) {
 	char * buffer = new char[1024];
 	int rd_status = read(read_from, buffer, 1024);
-	std::cout << "Client: '" << buffer << "'\n";
+	if(strcmp(buffer, "done") == 0) {
+		return 1;
+	}else {
+		std::cout << "Client: PID " << getpid()
+					<< " - " << buffer << "\n";
+	}
 	delete[] buffer;
+	return 0;
 }
 
 //Read handshake from server and confirm
