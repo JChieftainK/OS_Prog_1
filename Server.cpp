@@ -4,9 +4,12 @@
 #include <cstring>     //strcmp
 #include <fstream>     //std::ifstream
 #include <queue>       //std::queue
+#include <sstream>     //std::istringstream
+#include <algorithm>   //std::remove erase transform
 
 const std::string CONFIRMATION = "Confirmed";
 
+void read_confirmation(int);
 int read_handshake(int);
 std::string read_client(int);
 int write_client(int, const char*);
@@ -33,14 +36,12 @@ int main(int argc, char *argv[]) {
 	
 	//Read target file from client
 	std::string file_target = read_client(rd);
-	std::cout << "Server: '" << file_target << "'\n";
 
 	//Send confirmation
 	write_client(wr, CONFIRMATION.c_str());
 	
 	//Read target from client
 	std::string target = read_client(rd);
-	std::cout << "Server: '" << target << "'\n";
 	
 	//Send confirmation
 	write_client(wr, CONFIRMATION.c_str());
@@ -48,23 +49,63 @@ int main(int argc, char *argv[]) {
 	//Open target file
 	std::ifstream in(file_target.c_str(), std::ios_base::in);
 	if(in) {					//File has been opened
-		std::cout << "File Opened" << '\n'; //Data log
-				
 		std::string str;
 		std::queue<std::string> sq; //sq == string_queue
-		while(std::getline(in,str)) {
+		while(std::getline(in,str)) { //Fill queue line by line
 			sq.push(str);
 		}
 		in.close();
-				
-		while(!sq.empty()) {
-			std::cout << sq.front() << '\n';
-			sq.pop();
-		}
 		
-	}else {						//Error opening file
-		std::cout << "Did not open File: '" << file_target << '\'' << '\n';
+		int counter = 0;
+		int total = 0;
+		int line = 1;
+		std::istringstream istr;
+		std::ostringstream ostr;
+		std::transform(target.begin(), target.end(), target.begin(), ::tolower);
+		
+		while(!sq.empty()) { //Go through entire file line by line
+			istr.str(sq.front()); //set istringstream with line from queue
+			sq.pop(); //Remove line from queue
+			
+			while(istr.peek() != EOF){ //Go through istringstream until empty
+				istr >> str;
+				//Convert string into lowercase
+				std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+				//Remove different/common characters from the string
+				str.erase(std::remove(str.begin(), str.end(), '>'), str.end());
+				str.erase(std::remove(str.begin(), str.end(), '<'), str.end());
+				str.erase(std::remove(str.begin(), str.end(), '.'), str.end());
+				str.erase(std::remove(str.begin(), str.end(), '\''), str.end());
+				str.erase(std::remove(str.begin(), str.end(), '"'), str.end());
+				str.erase(std::remove(str.begin(), str.end(), ','), str.end());
+				//Compare the two strings and if equal increment counter
+				if(str.compare(target) == 0) {
+					++counter;
+				}
+			}
+			istr.clear();
+			if(counter > 0) {
+				ostr.str("");
+				ostr << "Target >>" << target << "<< Appeared on Line "<< line 
+									<< ",\t" << counter << " Times";
+				write_client(wr, (ostr.str()).c_str()); //Write to Client
+				read_confirmation(rd); //Read confirmation
+			}
+			++line;
+			total += counter;
+			counter = 0;
+		}
+		ostr.str("");
+		ostr << "Target >>" << target << "<< in File >>" << file_target 
+							<< "<< Appeared a Total of " << total << " Times.";
+		write_client(wr, (ostr.str()).c_str());
+		read_confirmation(rd);
+	}else {	 //Error opening file
+		std::cout << "Server: PID " << s_pid << " - DID NOT OPEN FILE: '" 
+							<< file_target << "'\n";
 	}
+	std::string finish = "done";
+	write_client(wr, finish.c_str());
 	
 	//Close pipes
 	close(rd);
@@ -94,9 +135,9 @@ void read_confirmation(int read_from) {
 std::string read_client(int read_from) {
 	char * buffer = new char[1024];
 	int rd_status = 0;
-	do{
+	//do{
 		rd_status = read(read_from, buffer, 1024);
-	}while(rd_status == 0);
+	//}while(rd_status == 0);
 	std::string result;
 	if(rd_status < 0) {
 		//Failure to read
