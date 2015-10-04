@@ -1,0 +1,15 @@
+Justin Kennedy
+OS 4323
+Programming Homework ONE
+
+Write-Up
+========
+During the course of this assignment. I worked with Layla Alachkar, Zach Gleason, and Rahul Chidurala. We created our own code but used each other as a means to bounce off ideas. All of my code is from my own accord.
+
+I had many failures so I will talk about the successes first. The biggest success is finalizing the program. A major success was being able to use Named Pipes correctly. A success that I enjoy is the creation of a makefile. Although they are very simple, they have the ability to be extremely helpful.
+
+Named Pipes were my biggest failure and caused the delay in finalizing my program. I could not comprehend how a Named Pipe worked from a background standpoint so I couldn’t use it effectively. After plenty of researching and reading different resources, I finally understood a more general concept of how Named Pipes work in the background. After this, I had the help of my peers to point me to the right direction in properly opening, closing, and removing of the pipes. This failure became a success.
+
+Another failure was that I worked hours on hours trying to get a phrase to be read and searched for. I was using strings and iterators. This would work but failed to reset properly so it would only work on the first occasion. I finally gave up on that idea and used istringstream’s ability to separate word by word using the >> operator. This allowed the program to find any single word by comparing the target with the file word using strings compare.
+
+I used many online resources to grasp a stronger understanding of Named Pipes and the semantics I needed to make my program work. I did not use any resources to just copy and paste into my code. Again, my code is of my own accord.

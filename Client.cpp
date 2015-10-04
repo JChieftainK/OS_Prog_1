@@ -1,3 +1,9 @@
+/*
+*	Justin Kennedy
+*	OS 4323
+*	Programming Homework ONE
+*	Using Named Pipes
+*/
 #include <iostream>
 #include <sys/stat.h>  //S_IRUSR S_IWUSR mkfifo
 #include <stdio.h>     //remove
@@ -109,7 +115,7 @@ void read_confirmation(int read_from) {
 int read_server(int read_from) {
 	char * buffer = new char[1024];
 	int rd_status = read(read_from, buffer, 1024);
-	if(strcmp(buffer, "done") == 0) {
+	if(strcmp(buffer, "Server-EOF") == 0) {
 		return 1;
 	}else {
 		std::cout << "Client: PID " << getpid()

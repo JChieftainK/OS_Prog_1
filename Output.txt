@@ -1,0 +1,61 @@
+Justin Kennedy
+OS 4323
+Programming Homework ONE
+
+This file will contain various outputs produced by the program.
+
+Output - no instances of target
+======
+Client: PID 14199 - Running on Sun Sep 27 09:45:57 2015
+Client: PID 14199 - Enter File Name:
+hw.txt
+Client: PID 14199 - Enter Target:
+run
+Client: PID 14199 - Input File >>>hw.txt<<<
+Client: PID 14199 - Target >>>run<<<
+Server: PID 14201 - Running on Sun Sep 27 09:46:04 2015
+Server: PID 14201 - Synchronized to Client.
+Client: PID 14199 - Synchronized to Server.
+Client: PID 14199 - Target >>run<< in File >>hw.txt<< Appeared a Total of 0 Times.
+Server: PID 14201 - Terminated on Sun Sep 27 09:46:04 2015
+Client: PID 14199 - Terminated on Sun Sep 27 09:46:04 2015
+
+Output - no file exists
+======
+Client: PID 14227 - Running on Sun Sep 27 09:51:51 2015
+Client: PID 14227 - Enter File Name:
+nofile.txt
+Client: PID 14227 - Enter Target:
+the
+Client: PID 14227 - Input File >>>nofile.txt<<<
+Client: PID 14227 - Target >>>the<<<
+Server: PID 14231 - Running on Sun Sep 27 09:52:20 2015
+Server: PID 14231 - Synchronized to Client.
+Client: PID 14227 - Synchronized to Server.
+Server: PID 14231 - DID NOT OPEN FILE: 'nofile.txt'
+Server: PID 14231 - Terminated on Sun Sep 27 09:52:20 2015
+Client: PID 14227 - Terminated on Sun Sep 27 09:52:20 2015
+
+Output - multiple instances occur
+======
+Client: PID 14234 - Running on Sun Sep 27 09:52:46 2015
+Client: PID 14234 - Enter File Name:
+hw.txt
+Client: PID 14234 - Enter Target:
+the
+Client: PID 14234 - Input File >>>hw.txt<<<
+Client: PID 14234 - Target >>>the<<<
+Server: PID 14235 - Running on Sun Sep 27 09:52:52 2015
+Server: PID 14235 - Synchronized to Client.
+Client: PID 14234 - Synchronized to Server.
+Client: PID 14234 - Target >>the<< Appeared on Line 5,	12 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 7,	9 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 39,	29 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 41,	1 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 43,	1 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 45,	1 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 47,	2 Times
+Client: PID 14234 - Target >>the<< Appeared on Line 49,	9 Times
+Client: PID 14234 - Target >>the<< in File >>hw.txt<< Appeared a Total of 64 Times.
+Server: PID 14235 - Terminated on Sun Sep 27 09:52:52 2015
+Client: PID 14234 - Terminated on Sun Sep 27 09:52:52 2015

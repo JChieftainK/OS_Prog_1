@@ -1,3 +1,9 @@
+/*
+*	Justin Kennedy
+*	OS 4323
+*	Programming Homework ONE
+*	Using Named Pipes
+*/
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>    //execl fork read write
@@ -104,7 +110,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "Server: PID " << s_pid << " - DID NOT OPEN FILE: '" 
 							<< file_target << "'\n";
 	}
-	std::string finish = "done";
+	std::string finish = "Server-EOF";
 	write_client(wr, finish.c_str());
 	
 	//Close pipes
